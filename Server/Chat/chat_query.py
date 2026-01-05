@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from pinecone import Pinecone, ServerlessSpec
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceInferenceEmbeddings
 
 load_dotenv()
 
@@ -16,10 +16,9 @@ PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = HUGGINGFACE_API_KEY
-
 pc = Pinecone(api_key=PINECONE_API_KEY)
 spec = ServerlessSpec(cloud="aws", region=PINECONE_ENV)
+
 existing_index = [i["name"] for i in pc.list_indexes()]
 
 if PINECONE_INDEX_NAME not in existing_index:
@@ -34,7 +33,9 @@ if PINECONE_INDEX_NAME not in existing_index:
 
 index = pc.Index(PINECONE_INDEX_NAME)
 
-embed_model = HuggingFaceEmbeddings(
+# 🔥 CHANGED: API-based embeddings (NO local model download)
+embed_model = HuggingFaceInferenceEmbeddings(
+    api_key=HUGGINGFACE_API_KEY,
     model_name="sentence-transformers/all-mpnet-base-v2"
 )
 
@@ -59,6 +60,7 @@ rag_chain = prompt | llm
 
 async def answer_query(query: str, user_role: str):
     embedding = await asyncio.to_thread(embed_model.embed_query, query)
+
     results = await asyncio.to_thread(
         index.query,
         vector=embedding,
@@ -79,22 +81,18 @@ async def answer_query(query: str, user_role: str):
         return {"answer": "No relevant information found.", "sources": []}
 
     docs_text = "\n".join(filtered_contexts)
+
     final_answer = await asyncio.to_thread(
-        rag_chain.invoke, {"question": query, "context": docs_text}
+        rag_chain.invoke,
+        {"question": query, "context": docs_text}
     )
 
     clean_answer = re.sub(r'(\*{1,2}|`+|\|)', '', final_answer.content)
     clean_answer = re.sub(r'\n{2,}', '\n\n', clean_answer)
     clean_answer = re.sub(r'\n', ' ', clean_answer)
     clean_answer = re.sub(r'\s{2,}', ' ', clean_answer).strip()
+
     return {
         "answer": clean_answer,
         "sources": list(sources)
     }
-
-if __name__ == "__main__":
-    async def test():
-        res = await answer_query("What is COVID-19?", user_role="doctor")
-        print(res)
-
-    asyncio.run(test())
