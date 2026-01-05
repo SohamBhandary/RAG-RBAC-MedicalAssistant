@@ -7,7 +7,7 @@ from tqdm.auto import tqdm
 from pinecone import Pinecone, ServerlessSpec
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceInferenceEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 load_dotenv()
 
@@ -43,7 +43,7 @@ async def load_vectorstore(uploaded_files, role: str, doc_id: str):
     """
 
     # 🔥 CHANGED: API-based embeddings
-    embed_model = HuggingFaceInferenceEmbeddings(
+    embed_model = HuggingFaceEndpointEmbeddings(
         api_key=HUGGINGFACEHUB_API_TOKEN,
         model_name="sentence-transformers/all-mpnet-base-v2"
     )

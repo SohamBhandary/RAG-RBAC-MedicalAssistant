@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from pinecone import Pinecone, ServerlessSpec
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
-from langchain_huggingface import HuggingFaceInferenceEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 load_dotenv()
 
@@ -34,7 +34,7 @@ if PINECONE_INDEX_NAME not in existing_index:
 index = pc.Index(PINECONE_INDEX_NAME)
 
 # 🔥 CHANGED: API-based embeddings (NO local model download)
-embed_model = HuggingFaceInferenceEmbeddings(
+embed_model = HuggingFaceEndpointEmbeddings(
     api_key=HUGGINGFACE_API_KEY,
     model_name="sentence-transformers/all-mpnet-base-v2"
 )
