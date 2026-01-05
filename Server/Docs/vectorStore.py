@@ -44,9 +44,9 @@ async def load_vectorstore(uploaded_files, role: str, doc_id: str):
 
     # 🔥 CHANGED: API-based embeddings
     embed_model = HuggingFaceEndpointEmbeddings(
-        api_key=HUGGINGFACEHUB_API_TOKEN,
-          huggingfacehub_api_token=os.getenv("HUGGINGFACEHUB_API_TOKEN")
-    )
+    model="sentence-transformers/all-mpnet-base-v2",
+    huggingfacehub_api_token=os.getenv("HUGGINGFACEHUB_API_TOKEN")
+)
 
     for file in uploaded_files:
         save_path = Path(UPLOAD_DIR) / file.filename

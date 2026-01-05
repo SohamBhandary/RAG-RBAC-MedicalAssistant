@@ -35,8 +35,8 @@ index = pc.Index(PINECONE_INDEX_NAME)
 
 # 🔥 CHANGED: API-based embeddings (NO local model download)
 embed_model = HuggingFaceEndpointEmbeddings(
-    api_key=HUGGINGFACE_API_KEY,
-     huggingfacehub_api_token=os.getenv("HUGGINGFACEHUB_API_TOKEN")
+    model="sentence-transformers/all-mpnet-base-v2",
+    huggingfacehub_api_token=os.getenv("HUGGINGFACEHUB_API_TOKEN")
 )
 
 llm = ChatGroq(
