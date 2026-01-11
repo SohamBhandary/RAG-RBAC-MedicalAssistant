@@ -27,7 +27,7 @@ def get_auth():
 # Auth UI
 
 def auth_ui():
-    st.title("Healthcare RBAC RAG")
+    st.title("CareGPT")
     st.subheader("Login or Signup")
 
     tab1,tab2=st.tabs(["Login","Signup"])
