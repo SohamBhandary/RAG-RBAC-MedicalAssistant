@@ -10,7 +10,7 @@ load_dotenv()
 
 API_URL=os.getenv("API")
 
-st.set_page_config(page_title="Healthcare RBAC RAG Chatbot",layout="centered")
+st.set_page_config(page_title="CareGPT",layout="centered")
 
 # Session state initalization
 if "username" not in st.session_state:
